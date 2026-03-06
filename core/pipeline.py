@@ -1,6 +1,6 @@
 """
 AXIOM Core Pipeline
-Orchestrates all 5 agents in sequence and sends WhatsApp report.
+Orchestrates all 6 agents in sequence and sends WhatsApp report + updates live dashboard.
 """
 
 import os
@@ -10,13 +10,15 @@ from agents.roast_fixer import RoastFixer
 from agents.trend_spotter import TrendSpotter
 from agents.build_mission import BuildMissionAgent
 from agents.whatsapp_sender import WhatsAppSender
+from agents.mission_builder import MissionBuilder
+from agents.dashboard_generator import DashboardGenerator
 
 load_dotenv()
 
 async def run_axiom_pipeline():
-    username = os.getenv("GITHUB_USERNAME")
-    github_token = os.getenv("GITHUB_TOKEN")
     anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+    github_token  = os.getenv("GITHUB_TOKEN")
+    username      = os.getenv("GITHUB_USERNAME")
 
     if not all([username, github_token, anthropic_key]):
         print("❌ Missing environment variables. Check your .env file.")
@@ -56,6 +58,28 @@ async def run_axiom_pipeline():
     sender.send(github_data, roast_data, trend_data, mission_data)
     print(f"   ✅ WhatsApp report sent!\n")
 
-    print("{'='*50}")
-    print("  ✅ AXIOM Pipeline Complete!")
+    # ── AGENT 6: Mission Builder ─────────────────────────
+    print("🔨 Agent 6: Mission Builder running...")
+    builder = MissionBuilder(anthropic_key, github_token, username)
+    build_data = builder.run(github_data, roast_data, trend_data, mission_data)
+    print(f"   ✅ {build_data['file_count']} files generated")
+    if build_data['repo_info'].get('url'):
+        print(f"   ✅ Mission repo: {build_data['repo_info']['url']}\n")
+
+    # ── DASHBOARD: Push live dashboard ───────────────────
+    print("📊 Dashboard: Updating live dashboard...")
+    dashboard = DashboardGenerator(github_token, username, "axiom")
+    dashboard.enable_github_pages()
+    dashboard_url = dashboard.push_dashboard(build_data['dashboard_data'])
+    if dashboard_url:
+        print(f"   ✅ Dashboard live at: {dashboard_url}\n")
+    else:
+        print(f"   ⚠️ Dashboard push failed — enable GitHub Pages manually\n")
+
+    print(f"{'='*50}")
+    print(f"  ✅ AXIOM Pipeline Complete!")
+    if dashboard_url:
+        print(f"  🌐 Dashboard: {dashboard_url}")
+    if build_data['repo_info'].get('url'):
+        print(f"  📦 Mission Repo: {build_data['repo_info']['url']}")
     print(f"{'='*50}\n")
