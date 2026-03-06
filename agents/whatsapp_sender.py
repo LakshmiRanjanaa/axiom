@@ -1,6 +1,7 @@
 """
 AXIOM Agent 5 — WhatsApp Sender
 Sends daily brief + dashboard + mission repo links to WhatsApp.
+Includes mission progress status and nudge if not started.
 """
 
 import os
@@ -14,7 +15,6 @@ class WhatsAppSender:
         self.auth_token = os.getenv("TWILIO_AUTH_TOKEN")
         self.from_number = os.getenv("TWILIO_WHATSAPP_FROM", "whatsapp:+14155238886")
         self.to_number = os.getenv("YOUR_WHATSAPP_NUMBER")
-        self.github_username = os.getenv("GITHUB_USERNAME", "")
 
     def _format_message(self, github_data, roast_data, trend_data, mission_data,
                          dashboard_url="", repo_url="") -> str:
@@ -39,7 +39,24 @@ class WhatsAppSender:
         mission_title = (mission_data.get('mission_title') or '')[:50]
         stack = ', '.join(mission_data.get('tech_stack', [])[:3])
 
-        # Build links section — only shown if URLs exist
+        # Progress section
+        progress_status = mission_data.get("_progress_status", "")
+        commit_count = mission_data.get("_progress_commits", 0)
+        nudge = mission_data.get("_nudge", "")
+        is_new_mission = mission_data.get("_is_new_mission", True)
+
+        if is_new_mission:
+            progress_line = "🆕 *New mission assigned!*"
+        elif progress_status == "in_progress":
+            progress_line = f"🔨 *Mission in progress* — {commit_count} commit(s) so far. Keep going!"
+        elif progress_status == "not_started":
+            progress_line = f"⏳ *Not started yet* — {nudge}" if nudge else "⏳ *Not started yet* — open the repo and write one line of code!"
+        elif progress_status == "completed":
+            progress_line = f"🎉 *Mission complete!* ({commit_count} commits) — new mission below 👇"
+        else:
+            progress_line = ""
+
+        # Links section
         links_section = ""
         if repo_url or dashboard_url:
             links_section = "\n🔗 *Links:*"
@@ -63,10 +80,11 @@ Stack: {langs}
 
 🎯 *Mission:* {mission_title}
 Stack: {stack}
+{progress_line}
 
 🎤 *Q:* {q1}{links_section}
 
-_AXIOM 🧠 | Daily 8AM_"""
+_AXIOM 🧠 | Daily 8AM — reply with any question!_"""
 
         return message
 
