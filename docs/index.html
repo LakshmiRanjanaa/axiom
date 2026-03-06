@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AXIOM Live Dashboard — @LakshmiRanjanaa</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#05070e;--card:#0f1220;--b:#1a1f35;--b2:#252b45;--a:#7c6af7;--a2:#f7c26a;--a3:#6af7c2;--text:#e8eaf8;--m:#6b7299;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'JetBrains Mono',monospace;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(124,106,247,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(124,106,247,0.02) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;}
+.wrap{max-width:1200px;margin:0 auto;padding:0 20px 60px;position:relative;z-index:1;}
+header{display:flex;align-items:center;justify-content:space-between;padding:24px 0 20px;border-bottom:1px solid var(--b);margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+.logo{display:flex;align-items:center;gap:12px;}
+.lm{width:38px;height:38px;background:linear-gradient(135deg,var(--a),var(--a3));border-radius:10px;display:grid;place-items:center;font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:#fff;box-shadow:0 0 16px rgba(124,106,247,0.4);}
+.lt{font-family:'Syne',sans-serif;font-weight:800;font-size:17px;letter-spacing:3px;}
+.ls{font-size:9px;letter-spacing:2px;color:var(--m);text-transform:uppercase;}
+.live{display:flex;align-items:center;gap:6px;font-size:10px;letter-spacing:2px;color:var(--a3);}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--a3);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.2}}
+.last-run{font-size:10px;color:var(--m);}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+@media(max-width:900px){.grid3,.grid4{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
+@media(max-width:500px){.grid3,.grid4,.grid2{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--b);border-radius:14px;padding:22px;}
+.card-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--m);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.card-title::after{content:'';flex:1;height:1px;background:var(--b);}
+.stat-val{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;line-height:1;}
+.stat-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--m);margin-top:4px;}
+.stat-icon{font-size:22px;margin-bottom:8px;}
+.score-wrap{display:flex;align-items:center;gap:20px;}
+.score-ring{position:relative;width:100px;height:100px;flex-shrink:0;}
+.score-ring svg{transform:rotate(-90deg);}
+.score-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.score-num{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;}
+.score-denom{font-size:10px;color:var(--m);}
+.score-info h3{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px;}
+.score-info p{font-size:11px;color:var(--m);line-height:1.6;}
+.roast-text{font-size:12px;color:var(--m);line-height:1.8;font-style:italic;border-left:3px solid var(--a);padding-left:14px;}
+.fix-item{font-size:11px;color:var(--m);padding:8px 0;border-bottom:1px solid var(--b);line-height:1.5;}
+.fix-item:last-child{border-bottom:none;}
+.trend-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--b);}
+.trend-item:last-child{border-bottom:none;}
+.trend-name{font-size:11px;}
+.trend-stars{font-size:10px;color:var(--a2);}
+.missing-box{background:rgba(247,106,106,0.06);border:1px solid rgba(247,106,106,0.2);border-radius:8px;padding:10px 14px;font-size:11px;color:#f76a6a;margin-top:12px;}
+.q-item{display:flex;gap:8px;font-size:11px;color:var(--m);padding:8px 0;border-bottom:1px solid var(--b);line-height:1.5;}
+.q-item:last-child{border-bottom:none;}
+.q-num{color:var(--a);font-weight:600;flex-shrink:0;}
+.mission-card{background:linear-gradient(135deg,rgba(124,106,247,0.1),rgba(106,247,194,0.04));border:1px solid rgba(124,106,247,0.25);border-radius:14px;padding:22px;margin-bottom:16px;}
+.mission-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--a);margin-bottom:6px;}
+.mission-desc{font-size:12px;color:var(--m);line-height:1.7;margin-bottom:14px;}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+.tag{font-size:9px;letter-spacing:1px;padding:3px 10px;border-radius:20px;background:rgba(124,106,247,0.15);border:1px solid rgba(124,106,247,0.3);color:var(--a);}
+.step-item{display:flex;gap:10px;font-size:11px;color:var(--m);padding:8px 0;border-bottom:1px solid var(--b);line-height:1.5;}
+.step-item:last-child{border-bottom:none;}
+.step-num{width:20px;height:20px;border-radius:50%;background:rgba(124,106,247,0.2);border:1px solid rgba(124,106,247,0.4);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--a);flex-shrink:0;font-weight:700;}
+.repo-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;background:linear-gradient(135deg,var(--a),#9c8cf7);border-radius:8px;color:#fff;text-decoration:none;font-family:'Syne',sans-serif;font-weight:700;font-size:12px;letter-spacing:1px;margin-top:12px;transition:all 0.2s;}
+.repo-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(124,106,247,0.4);}
+.repo-btn.disabled{background:var(--b2);color:var(--m);pointer-events:none;}
+.weak-item{font-size:10px;color:var(--m);padding:5px 0;border-bottom:1px solid var(--b);}
+.weak-item:last-child{border-bottom:none;}
+footer{text-align:center;padding:24px 0;font-size:10px;color:var(--m);letter-spacing:2px;border-top:1px solid var(--b);margin-top:8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="logo">
+    <div class="lm">A</div>
+    <div><div class="lt">AXIOM</div><div class="ls">Live Intelligence Dashboard</div></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+    <div class="live"><div class="dot"></div>LIVE</div>
+    <div class="last-run">Last run: 06 Mar 2026, 09:27 AM</div>
+  </div>
+</header>
+
+<!-- STATS ROW -->
+<div class="grid4">
+  <div class="card">
+    <div class="stat-icon">📁</div>
+    <div class="stat-val" style="color:var(--a)">5</div>
+    <div class="stat-label">Total Repos</div>
+  </div>
+  <div class="card">
+    <div class="stat-icon">⭐</div>
+    <div class="stat-val" style="color:var(--a2)">0</div>
+    <div class="stat-label">Stars Earned</div>
+  </div>
+  <div class="card">
+    <div class="stat-icon">🔥</div>
+    <div class="stat-val" style="color:var(--a3)">1</div>
+    <div class="stat-label">Active Days</div>
+  </div>
+  <div class="card">
+    <div class="stat-icon">💻</div>
+    <div class="stat-val" style="color:#6ab8f7;font-size:18px;margin-top:6px;">HTML</div>
+    <div class="stat-label">Stack</div>
+  </div>
+</div>
+
+<!-- SCORE + ROAST -->
+<div class="grid2">
+  <div class="card">
+    <div class="card-title">Profile Score</div>
+    <div class="score-wrap">
+      <div class="score-ring">
+        <svg width="100" height="100" viewBox="0 0 100 100">
+          <circle fill="none" stroke="var(--b2)" stroke-width="8" cx="50" cy="50" r="42"/>
+          <circle fill="none" stroke="#f76a6a" stroke-width="8" stroke-linecap="round"
+            cx="50" cy="50" r="42"
+            stroke-dasharray="314"
+            stroke-dashoffset="207"
+            style="filter:drop-shadow(0 0 6px #f76a6a)"/>
+        </svg>
+        <div class="score-center">
+          <div class="score-num" style="color:#f76a6a">34</div>
+          <div class="score-denom">/100</div>
+        </div>
+      </div>
+      <div class="score-info">
+        <h3>🔴 @LakshmiRanjanaa</h3>
+        <p>Profile analyzed by AXIOM Agent 1. Score based on README quality, language diversity, stars, and activity.</p>
+        <div class="weak-item">⚠️ 5 repos have no description — recruiters skip these instantly</div><div class="weak-item">⚠️ Only 1 language detected — shows narrow skill set</div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Recruiter Roast 💀</div>
+    <div class="roast-text">Your GitHub looks like a graveyard of abandoned IoT experiments with zero documentation or professional presentation. With only HTML as your listed language and repos that scream "college homework I never finished," you're not even entry-level ready. Write actual descriptions, ad</div>
+    <div style="margin-top:14px;">
+      <div class="card-title">Quick Fixes</div>
+      <div class="fix-item">✏️ Add compelling descriptions to all repositories</div><div class="fix-item">✏️ Diversify your technology stack</div><div class="fix-item">✏️ Create a comprehensive README for each project</div>
+    </div>
+  </div>
+</div>
+
+<!-- MISSION -->
+<div class="mission-card">
+  <div class="card-title">🎯 Today's Build Mission — Auto-Generated by AXIOM</div>
+  <div class="mission-title">Interactive Stock Price Tracker</div>
+  <div class="mission-desc">Build a responsive web dashboard that fetches real-time stock data from a free API and displays price charts with search functionality. This demonstrates full-stack thinking, API integration, and modern web development practices that recruiters actively seek.</div>
+  <div class="tags">
+    <span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span><span class="tag">Chart.js</span>
+    <span class="tag">~5hrs</span>
+    <span class="tag">beginner</span>
+  </div>
+  <div class="card-title">Starter Steps</div>
+  <div class="step-item"><span class="step-num">1</span>Set up project structure with HTML/CSS/JS files and get Alpha Vantage free API key</div><div class="step-item"><span class="step-num">2</span>Create responsive layout with search input and chart container using CSS Grid/Flexbox</div><div class="step-item"><span class="step-num">3</span>Implement JavaScript to fetch stock data and render interactive charts with Chart.js library</div>
+  <p style="font-size:11px;color:var(--a3);margin-top:12px;">💼 Financial data visualization is extremely marketable, and this project demonstrates API integration, data handling, and modern JavaScript skills that 90% of entry-level candidates lack.</p>
+  <a href="https://github.com/LakshmiRanjanaa/axiom-mission-interactive-stock-price-tracker" target="_blank" class="repo-btn">🔗 Open Mission Repo</a>
+</div>
+
+<!-- TRENDING + INTERVIEW -->
+<div class="grid3">
+  <div class="card">
+    <div class="card-title">📈 Trending in Stack</div>
+    
+            <div class="trend-item">
+              <span class="trend-name">traderwillhu/market_dashboard</span>
+              <span class="trend-stars">⭐ 110</span>
+            </div>
+    <div class="missing-box">⚠️ Missing: JavaScript · CSS · React/Vue.js · Python</div>
+  </div>
+  <div class="card" style="grid-column:span 2">
+    <div class="card-title">🎤 Interview Prep</div>
+    <div class="q-item"><span class="q-num">1.</span> Can you explain the difference between semantic and non-semantic HTML elements, and provide examples of when you would use each?</div><div class="q-item"><span class="q-num">2.</span> How would you structure an HTML form with proper validation attributes, and what accessibility considerations would you include?</div><div class="q-item"><span class="q-num">3.</span> What is the purpose of the HTML document structure (DOCTYPE, html, head, body), and how does proper nesting of elements affect browser rendering?</div>
+  </div>
+</div>
+
+<footer>AXIOM 🧠 · Autonomous GitHub Intelligence · Runs daily 8AM · Made by @LakshmiRanjanaa</footer>
+</div>
+</body>
+</html>
