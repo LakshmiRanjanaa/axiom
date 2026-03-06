@@ -57,11 +57,3 @@ class RoastFixer:
             "fixes": self._generate_fixes(github_data),
             "readme_fix": self._generate_readme(github_data),
             "interview_questions": self._generate_interview_questions(github_data)
-        }
-```
-
-After pasting → `Ctrl+S` → close Notepad → then:
-```
-git add .
-git commit -m "rewrite roast_fixer"
-git push
