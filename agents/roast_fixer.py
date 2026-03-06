@@ -56,4 +56,4 @@ class RoastFixer:
             "roast": self._generate_roast(github_data),
             "fixes": self._generate_fixes(github_data),
             "readme_fix": self._generate_readme(github_data),
-            "interview_questions": self._generate_interview_questions(github_data)
+            "interview_questions": self._generate_interview_questions(github_data)}
