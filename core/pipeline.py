@@ -1,8 +1,8 @@
 """
-AXIOM Core Pipeline
-Orchestrates all 6 agents in sequence and sends WhatsApp report + updates live dashboard.
+AXIOM Core Pipeline — 6 Agents
+Agent 6 (Mission Builder) runs BEFORE Agent 5 (WhatsApp)
+so that repo_url and dashboard_url are available to include in the message.
 """
-
 import os
 from dotenv import load_dotenv
 from agents.github_auditor import GitHubAuditor
@@ -52,19 +52,16 @@ async def run_axiom_pipeline():
     mission_data = mission_agent.run(github_data, trend_data, roast_data)
     print(f"   ✅ Mission: {mission_data['mission_title']}\n")
 
-    # ── AGENT 5: WhatsApp Sender ─────────────────────────
-    print("📲 Agent 5: WhatsApp Sender running...")
-    sender = WhatsAppSender()
-    sender.send(github_data, roast_data, trend_data, mission_data)
-    print(f"   ✅ WhatsApp report sent!\n")
-
-    # ── AGENT 6: Mission Builder ─────────────────────────
+    # ── AGENT 6: Mission Builder ──────────────────────────
+    # Runs BEFORE WhatsApp so repo_url exists when message is sent
     print("🔨 Agent 6: Mission Builder running...")
     builder = MissionBuilder(anthropic_key, github_token, username)
     build_data = builder.run(github_data, roast_data, trend_data, mission_data)
     print(f"   ✅ {build_data['file_count']} files generated")
-    if build_data['repo_info'].get('url'):
-        print(f"   ✅ Mission repo: {build_data['repo_info']['url']}\n")
+
+    repo_url = build_data['repo_info'].get('url', '')
+    if repo_url:
+        print(f"   ✅ Mission repo: {repo_url}\n")
 
     # ── DASHBOARD: Push live dashboard ───────────────────
     print("📊 Dashboard: Updating live dashboard...")
@@ -74,12 +71,25 @@ async def run_axiom_pipeline():
     if dashboard_url:
         print(f"   ✅ Dashboard live at: {dashboard_url}\n")
     else:
+        dashboard_url = f"https://{username}.github.io/axiom/"
         print(f"   ⚠️ Dashboard push failed — enable GitHub Pages manually\n")
+
+    # ── AGENT 5: WhatsApp Sender ──────────────────────────
+    # Runs LAST so it has both repo_url and dashboard_url to include
+    print("📲 Agent 5: WhatsApp Sender running...")
+    sender = WhatsAppSender()
+    sender.send(
+        github_data,
+        roast_data,
+        trend_data,
+        mission_data,
+        dashboard_url=dashboard_url,
+        repo_url=repo_url
+    )
+    print(f"   ✅ WhatsApp report sent!\n")
 
     print(f"{'='*50}")
     print(f"  ✅ AXIOM Pipeline Complete!")
-    if dashboard_url:
-        print(f"  🌐 Dashboard: {dashboard_url}")
-    if build_data['repo_info'].get('url'):
-        print(f"  📦 Mission Repo: {build_data['repo_info']['url']}")
+    print(f"  🌐 Dashboard: {dashboard_url}")
+    print(f"  📦 Mission Repo: {repo_url}")
     print(f"{'='*50}\n")
