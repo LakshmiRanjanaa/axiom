@@ -35,7 +35,6 @@ Languages: {', '.join(github_data['languages'])}
 Total stars: {github_data['total_stars']}
 Weak spots found: {json.dumps(github_data['weak_spots'])}
 Top repos: {json.dumps([r['name'] + ': ' + r['description'] for r in github_data['top_repos']])}
-
 Give a brutally honest 3-4 sentence roast of this profile from a recruiter's perspective."""
 
         return self._call_claude(system, user)
